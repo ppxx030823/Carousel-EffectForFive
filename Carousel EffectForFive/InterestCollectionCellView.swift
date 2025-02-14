@@ -5,6 +5,7 @@
 //  Created by ppx on 2025/2/13.
 //
 import UIKit
+import SnapKit
 
 
 class InterestCollectionCellView: UICollectionViewCell {
@@ -12,7 +13,7 @@ class InterestCollectionCellView: UICollectionViewCell {
 
     let featuredImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -48,16 +49,18 @@ class InterestCollectionCellView: UICollectionViewCell {
     }
 
     private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            featuredImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            featuredImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            featuredImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            featuredImageView.heightAnchor.constraint(equalToConstant: 300),
+        featuredImageView.snp.makeConstraints { make in
+            make.top.equalTo(interestTitleLabel.snp.bottom).inset(10)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+            make.leading.equalTo(contentView.snp.leading)
+            make.trailing.equalTo(contentView.snp.trailing)
+        }
 
-            interestTitleLabel.topAnchor.constraint(equalTo: featuredImageView.bottomAnchor, constant: 10),
-            interestTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            interestTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
-        ])
+        interestTitleLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.height.equalTo(40)
+            make.centerX.equalTo(featuredImageView.snp.centerX)
+        }
     }
 
     private func updateUI() {

@@ -61,7 +61,7 @@ class HomeViewController: UIViewController {
         }
 
         collectionView.snp.makeConstraints { make in
-            make.top.bottom.equalTo(view.safeAreaLayoutGuide).inset(0)
+            make.top.bottom.equalToSuperview().inset(0)
             make.leading.trailing.equalToSuperview().inset(0)
         }
     }
@@ -77,6 +77,9 @@ class HomeViewController: UIViewController {
         if let firstInterest = interests.first, let backgroundImage = firstInterest.backgroundImage {
             // 设置背景图片
             backgroundImageView.image = backgroundImage
+        }
+        backgroundImageView.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
         }
         collectionView.backgroundView = self.blurEffecctView            //添加虚化效果
     }

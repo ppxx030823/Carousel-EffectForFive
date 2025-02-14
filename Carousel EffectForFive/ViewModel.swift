@@ -29,7 +29,7 @@ class HomeViewModel {
 
     func cellSize() -> CGSize {
         let cellPadding: CGFloat = 20.0
-        return CGSize(width: UIScreen.main.bounds.width - 2 * cellPadding, height: 450)
+        return CGSize(width: UIScreen.main.bounds.width - 2 * cellPadding, height: UIScreen.main.bounds.height - 5 * cellPadding)
     }
 
     func minimumLineSpacing() -> CGFloat {
