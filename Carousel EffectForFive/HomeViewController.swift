@@ -41,6 +41,33 @@ class HomeViewController: UIViewController {
         setupSubviews()
         setupConstraints()
         setupCollectionView()
+        setupBackground()
+    }
+
+    // MARK: 横屏竖屏切换
+    override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        coordinator.animate(alongsideTransition: { _ in
+            // 更新集合视图的布局
+            if let layout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+                layout.itemSize = self.viewModel.cellSize()
+                layout.minimumLineSpacing = self.viewModel.minimumLineSpacing()
+                layout.sectionInset = self.viewModel.sectionInset()
+            }
+
+            // 更新背景图片和虚化效果的约束
+            self.backgroundImageView.snp.remakeConstraints { make in
+                make.edges.equalToSuperview().inset(0)
+            }
+            self.collectionView.snp.remakeConstraints { make in
+                make.top.bottom.equalToSuperview().inset(0)
+                make.leading.trailing.equalToSuperview().inset(0)
+            }
+
+            // 重新布局集合视图
+            self.collectionView.collectionViewLayout.invalidateLayout()
+        }, completion: nil)
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -53,9 +80,6 @@ class HomeViewController: UIViewController {
     }
 
     private func setupConstraints() {
-        makeBackground()
-
-
         backgroundImageView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(0)
         }
@@ -72,16 +96,13 @@ class HomeViewController: UIViewController {
         collectionView.register(InterestCollectionCellView.self, forCellWithReuseIdentifier: InterestCollectionCellView.reuseIdentifier)
     }
 
-    func makeBackground() {
+    private func setupBackground() {
         let interests = Interest.createInterests()
         if let firstInterest = interests.first, let backgroundImage = firstInterest.backgroundImage {
             // 设置背景图片
             backgroundImageView.image = backgroundImage
         }
-        backgroundImageView.snp.makeConstraints { make in
-            make.bottom.equalToSuperview()
-        }
-        collectionView.backgroundView = self.blurEffecctView            //添加虚化效果
+        collectionView.backgroundView = blurEffecctView // 添加虚化效果
     }
 }
 
@@ -117,7 +138,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 }
 
 extension HomeViewController: UIScrollViewDelegate {
-    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let currentOffset = targetContentOffset.pointee
         targetContentOffset.pointee = viewModel.targetContentOffset(for: currentOffset)
     }
