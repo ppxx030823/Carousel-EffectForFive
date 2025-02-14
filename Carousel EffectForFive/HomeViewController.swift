@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 
 class HomeViewController: UIViewController {
@@ -28,18 +29,18 @@ class HomeViewController: UIViewController {
         return collectionView
     }()
 
+    private let blurEffecctView: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .regular)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.translatesAutoresizingMaskIntoConstraints = false
+        return blurEffectView
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSubviews()
         setupConstraints()
         setupCollectionView()
-
-        // 获取 Interest 数组
-        let interests = Interest.createInterests()
-        if let firstInterest = interests.first, let backgroundImage = firstInterest.backgroundImage {
-            // 设置背景图片
-            backgroundImageView.image = backgroundImage
-        }
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -52,23 +53,32 @@ class HomeViewController: UIViewController {
     }
 
     private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
-            backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        makeBackground()
 
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
+
+        backgroundImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(0)
+        }
+
+        collectionView.snp.makeConstraints { make in
+            make.top.bottom.equalTo(view.safeAreaLayoutGuide).inset(0)
+            make.leading.trailing.equalToSuperview().inset(0)
+        }
     }
 
     private func setupCollectionView() {
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(InterestCollectionViewCell.self, forCellWithReuseIdentifier: InterestCollectionViewCell.reuseIdentifier)
+        collectionView.register(InterestCollectionCellView.self, forCellWithReuseIdentifier: InterestCollectionCellView.reuseIdentifier)
+    }
+
+    func makeBackground() {
+        let interests = Interest.createInterests()
+        if let firstInterest = interests.first, let backgroundImage = firstInterest.backgroundImage {
+            // 设置背景图片
+            backgroundImageView.image = backgroundImage
+        }
+        collectionView.backgroundView = self.blurEffecctView            //添加虚化效果
     }
 }
 
@@ -82,7 +92,7 @@ extension HomeViewController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: InterestCollectionViewCell.reuseIdentifier, for: indexPath) as! InterestCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: InterestCollectionCellView.reuseIdentifier, for: indexPath) as! InterestCollectionCellView
         let interest = viewModel.interest(at: indexPath)
         cell.interest = interest
         return cell
