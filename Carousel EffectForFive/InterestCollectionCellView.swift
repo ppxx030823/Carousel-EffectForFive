@@ -7,7 +7,7 @@
 import UIKit
 
 
-class InterestCollectionViewCell: UICollectionViewCell {
+class InterestCollectionCellView: UICollectionViewCell {
     static let reuseIdentifier = "InterestCell"
 
     let featuredImageView: UIImageView = {
